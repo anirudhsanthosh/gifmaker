@@ -1,6 +1,6 @@
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
 const ffmpeg = createFFmpeg({ log: true, progress: (e) => console.log({ e }) });
@@ -138,6 +138,42 @@ function App() {
         toast.success("Copied");
     }
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    function getImageUrl() {
+        if (!textareaRef.current) return;
+
+        const text = textareaRef.current.value;
+
+        if (!text.length) return toast.error("please fill some text first.");
+
+        const parser = new DOMParser();
+
+        try {
+            const dom = parser.parseFromString(text, "text/html");
+
+            const link = dom.querySelector("img")?.src;
+
+            if (!link) return toast.error("No link found please try again");
+
+            var copyText = document.getElementById("img-link");
+
+            (copyText as HTMLInputElement).value = link;
+
+            if (!copyText) return toast.error("Failed to copy");
+
+            // Select the text field
+            (copyText as HTMLInputElement).select();
+            (copyText as HTMLInputElement).setSelectionRange(0, 99999); // For mobile devices
+
+            // Copy the text inside the text field
+            navigator.clipboard.writeText((copyText as HTMLInputElement).value);
+
+            toast.success("Copied");
+        } catch (err) {
+            return toast.error("Sorry unable to get link");
+        }
+    }
+
     if (userPassword !== password)
         return (
             <div className="flex items-center justify-center w-screen h-screen">
@@ -252,6 +288,16 @@ function App() {
                 </div>
                 <Toaster />
             </div>
+            <div className="flex flex-col items-center justify-center gap-3 p-4">
+                <p>Get image url from script</p>
+                <textarea ref={textareaRef} className="w-full p-2 border border-blue-600 rounded-lg"></textarea>
+
+                <button className="px-4 py-3 text-white bg-blue-600 rounded-md" onClick={getImageUrl}>
+                    {" "}
+                    get code
+                </button>
+            </div>
+            <input type="text" className="w-px h-px" id="img-link" />
         </>
     );
 }
