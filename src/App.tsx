@@ -123,8 +123,8 @@ function App() {
         }
     };
 
-    function copy() {
-        var copyText = document.getElementById("myInput");
+    function copy(id = "myInput") {
+        var copyText = document.getElementById(id);
 
         if (!copyText) return toast.error("Failed to copy");
 
@@ -153,6 +153,10 @@ function App() {
 
             const link = dom.querySelector("img")?.src;
 
+            const videoLink = dom.querySelector("a")?.href;
+
+            (document.getElementById("video-link") as HTMLInputElement).value = videoLink ?? "";
+
             if (!link) return toast.error("No link found please try again");
 
             var copyText = document.getElementById("img-link");
@@ -168,7 +172,7 @@ function App() {
             // Copy the text inside the text field
             navigator.clipboard.writeText((copyText as HTMLInputElement).value);
 
-            toast.success("Copied");
+            toast.success("image link Copied");
         } catch (err) {
             return toast.error("Sorry unable to get link");
         }
@@ -291,6 +295,13 @@ function App() {
             <div className="flex flex-col items-center justify-center gap-3 p-4">
                 <p>Get image url from script</p>
                 <textarea ref={textareaRef} className="w-full p-2 border border-blue-600 rounded-lg"></textarea>
+
+                <div className="flex w-full gap-3">
+                    <input type="text" className="w-full p-2 border border-blue-600 rounded-lg" id="video-link"></input>
+                    <button className="px-4 py-3 text-white bg-blue-600 rounded-md" onClick={() => copy("video-link")}>
+                        copy
+                    </button>
+                </div>
 
                 <button className="px-4 py-3 text-white bg-blue-600 rounded-md" onClick={getImageUrl}>
                     {" "}
